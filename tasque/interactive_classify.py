@@ -5,9 +5,10 @@ It is very nice.
 """
 
 import sys
-import string
 import tty
 import termios
+
+from . import log
 
 # TODO: undo
 def classify_list(initial_options=[], strs_to_print_gen=[]):
@@ -62,7 +63,7 @@ def classify_list(initial_options=[], strs_to_print_gen=[]):
             elif c == ' ':
                 option_offset += len(letters)
             elif c == 'q' or ord(c) == 4:
-                raise StopIteration
+                return results
             elif ord(c) == 3:
                 # ctrl-c
                 raise ValueError("user ctrl-c")
@@ -83,6 +84,7 @@ def classify_list(initial_options=[], strs_to_print_gen=[]):
         running_options[selected_option] = newmax
 
         results.append(selected_option)
+    return results
 
 
 def getch():

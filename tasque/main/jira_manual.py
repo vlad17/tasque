@@ -36,11 +36,14 @@ def _main(_argv):
     if os.path.isfile(flags.FLAGS.dst):
         log.debug("existing dst {} found, warm-starting", flags.FLAGS.dst)
         df = pd.read_pickle(flags.FLAGS.dst)
-        keys = df["Issue key"].unique()
+        keys = df[~pd.isnull(df["class"])]["Issue key"].unique()
         present = srcdf["Issue key"].isin(keys)
         log.debug("found {} keys already classified, skipping those",
                   present.sum())
-        df = pd.concat([df, srcdf[~present]], ignore_index=True)
+        old = srcdf["Issue key"].isin(df["Issue key"].unique())
+        log.debug("found {} new keys to classify, adding those",
+                  (~old).sum())
+        df = pd.concat([df, srcdf[~old]], ignore_index=True, sort=False)
     else:
         df = srcdf
         df["class"] = np.nan
