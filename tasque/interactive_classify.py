@@ -7,11 +7,9 @@ It is very nice.
 import sys
 import tty
 import termios
+from collections import defaultdict
 
-from . import log
-
-# TODO: undo
-def classify_list(initial_options=[], strs_to_print_gen=[]):
+def classify_list(initial_options={}, strs_to_print_gen=[]):
     """
     Given a generator of strings to print, this list classification
     gives an easy-to-interact manual classification interaction in
@@ -20,10 +18,12 @@ def classify_list(initial_options=[], strs_to_print_gen=[]):
     Returns a generator for the user's answers.
 
     Accepts initial options, which should be prioritized (higher
-    priority -- earlier shown)
+    priority -- earlier shown) by frequency
     """
 
-    running_options = initial_options # maps to age
+    # maps to frequency
+    running_options = defaultdict(int)
+    running_options.update(initial_options)
 
     results = []
     history = []
@@ -79,9 +79,7 @@ def classify_list(initial_options=[], strs_to_print_gen=[]):
         if selected_option is None:
             continue # must've undone
 
-        oldmax = max(running_options.values()) if running_options else 0
-        newmax = oldmax + 1
-        running_options[selected_option] = newmax
+        running_options[selected_option] += 1
 
         results.append(selected_option)
     return results
